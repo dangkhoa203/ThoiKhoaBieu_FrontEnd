@@ -30,7 +30,7 @@ export default function Admin(){
 
     },[])
     if(!admin.islog && admin.name===""){
-        navigate("/admin");
+        navigate("/");
     }
     return(
         <>
@@ -50,18 +50,15 @@ export default function Admin(){
                                     <Link to="taikhoan" className='w-100 btn btn-primary' >Tài khoản</Link>
                                 </Col>
                                 <Col>
-                                    <Button className='w-100' variant="primary" >1</Button>
+                                    <Link to="LichGiangDay" className='w-100 btn btn-primary' >Lịch giảng dạy</Link>
                                 </Col>
                                 <Col>
-                                    <Button className='w-100' variant="primary" >1</Button>
-                                </Col>
-                                <Col>
-                                    <Button className='w-100' variant="primary" >1</Button>
+                                    <Link to="ThongBao" className='w-100 btn btn-primary' >Thông báo</Link>
                                 </Col>
                             </Row>
                         </Container>
 
-                        <Container className="justify-content-center d-flex pt-4 pb-4 border mt-4 border-3" >
+                        <Container className="justify-content-center d-flex ps-0 pt-4 pb-4 border mt-4 border-3" >
                             <Outlet context={{admin}}/>
                         </Container>
                     </Container>

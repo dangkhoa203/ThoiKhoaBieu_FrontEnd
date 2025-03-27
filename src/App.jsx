@@ -1,5 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css'
+import './CSS/Admin.css'
 import NavBar from "./Component/NavBar.jsx";
 import RouteComponent from "./Component/RouteComponent.jsx";
 import { useLocation, matchPath } from "react-router";

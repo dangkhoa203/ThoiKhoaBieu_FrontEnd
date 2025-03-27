@@ -4,21 +4,18 @@ import {Button, Col, Container, Row} from "react-bootstrap";
 export default function TaiKhoanMenu(){
     return(
         <>
-            <Container fluid className="text-center">
-                <h1>Menu giảng viên</h1>
-                <Container className='justify-content-center d-flex' fluid>
+            <Container fluid className="text-center p-0">
+                <h1>Menu tài khoản</h1>
+                <Container className='justify-content-center d-flex pb-3 border-bottom mb-3' fluid>
                     <Row className="pt-3 w-75 justify-content-center">
                         <Col>
-                            <Link to="tao" className='w-100 btn btn-primary' >Tạo</Link>
+                            <Link to="DanhSach" className='w-100 btn btn-primary' >Danh sách tài khoản</Link>
                         </Col>
                         <Col>
-                            <Button className='w-100' variant="primary" >1</Button>
+                            <Link to="Them" className='w-100 btn btn-primary' >Thêm tài khỏan</Link>
                         </Col>
                         <Col>
-                            <Button className='w-100' variant="primary" >1</Button>
-                        </Col>
-                        <Col>
-                            <Button className='w-100' variant="primary" >1</Button>
+                            <Link to="DatMatKhau" className='w-100 btn btn-primary' >Đặt lại mật khẩu Admin</Link>
                         </Col>
                     </Row>
                 </Container>
