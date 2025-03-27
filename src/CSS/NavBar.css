@@ -1,0 +1,17 @@
+#NavBar {
+    background-color: #005EB8;
+    padding: 3px 10px;
+    a{
+        color: #ca4535;
+        font-size: 2em;
+        border-bottom: 5px solid #005EB8;
+        transition: 0.5s all ease;
+        margin: 0;
+        text-decoration: none;
+
+    }
+    .active{
+        border-bottom: 5px solid #ca4535;
+        transition: 0.5s all ease;
+    }
+}
