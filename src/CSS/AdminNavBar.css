@@ -1,0 +1,29 @@
+.NavButton{
+   width: 100%;
+    border: none;
+    padding: 10px;
+    background-color: #434656;
+    transition: 0.3s background-color ease-in-out;
+    color: white;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    border-bottom: 2px solid #4d5163;
+}
+.NavButton:hover{
+    background-color: #bbbecf;
+    color: black;
+    transition: 0.3s background-color ease-in-out;
+}
+#admin-NavBar{
+    box-shadow: 0 1px 7px 1px black;
+}
+#admin-NavBar-Content{
+    padding: 0 20px;
+}
+.menu-body{
+    background-color:#1D243A;
+}
+.menu-header{
+    background-color: #1D243A;
+    border-bottom: 2px solid #989898;
+}

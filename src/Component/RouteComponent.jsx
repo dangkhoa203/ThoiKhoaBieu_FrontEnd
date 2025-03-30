@@ -13,6 +13,7 @@ import AdminSuaLichGiang from "./Admin/LichGiangDay/AdminSuaLichGiang.jsx";
 import SuaTaiKhoan from "./Admin/TaiKhoan/SuaTaiKhoan.jsx";
 import AdminDanhSachThongBao from "./Admin/ThongBao/AdminDanhSachThongBao.jsx";
 import AdminGuiThongBao from "./Admin/ThongBao/AdminGuiThongBao.jsx";
+import AdminLogin from "./Admin/AdminLogin.jsx";
 
 export default function RouteComponent(){
     return (
@@ -21,6 +22,7 @@ export default function RouteComponent(){
             <Route element={<Test/>} path="/test"/>
 
             <Route path="/Admin" element={<Admin> </Admin>}>
+                <Route path="Login" element={<AdminLogin/>}/>
                 <Route path="TaiKhoan" element={ <TaiKhoanMenu/> } >
                     <Route path="DatMatKhau" element={ <DatLaiMatKhau/> }/>
                     <Route path="DanhSach" element={ <DanhSachTaiKhoan/> }/>

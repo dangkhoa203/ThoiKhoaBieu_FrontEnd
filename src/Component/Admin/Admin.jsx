@@ -1,7 +1,7 @@
 import {Link, Outlet, useNavigate} from "react-router";
-import {Button, Col, Container, FloatingLabel, Form, Row} from "react-bootstrap";
+import {Button, Col, Container, Dropdown, FloatingLabel, Form, Navbar, Offcanvas, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
-
+import '/src/CSS/AdminNavBar.css'
 export default function Admin(){
     const navigate = useNavigate();
     const [admin,setAdmin] = useState({
@@ -9,99 +9,48 @@ export default function Admin(){
         name:"admin"
     }
     );
-    const [loginInfo,setLoginInfo] = useState({
-        UserName:"",
-        Password:"",
-    })
-    const handleUsernameChange = (e) => {
-        setLoginInfo({...loginInfo, UserName: e.target.value});
-    }
-    const handlePasswordChange = (e) => {
-        setLoginInfo({...loginInfo, Password: e.target.value});
-    }
-    const adminLogin = () => {
-        if(loginInfo.UserName === "admin"){
-            if(loginInfo.Password === "admin"){
-                setAdmin({username: loginInfo.UserName,islog: true});
-            }
-        }
-    }
-    useEffect(()=>{
+    const [show, setShow] = useState(false);
 
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    useEffect(()=>{
+        // setAdmin({islog:false,name:""});
     },[])
     if(!admin.islog && admin.name===""){
-        navigate("/");
+        navigate("login");
     }
     return(
         <>
-                {admin.islog?
-                    <Container className="" fluid>
-                        <Container fluid className="pt-3 d-flex gap-3">
-                            <Button variant="dark"
-                                    onClick={()=>setAdmin({... admin,islog: false,name: ""})}
-                            >
-                                Logout
-                            </Button>
-                            <h3>Xin chào {admin.name}</h3>
-                        </Container>
-                        <Container className='justify-content-center d-flex' fluid>
-                            <Row className="pt-3 w-75 justify-content-center">
-                                <Col>
-                                    <Link to="taikhoan" className='w-100 btn btn-primary' >Tài khoản</Link>
-                                </Col>
-                                <Col>
-                                    <Link to="LichGiangDay" className='w-100 btn btn-primary' >Lịch giảng dạy</Link>
-                                </Col>
-                                <Col>
-                                    <Link to="ThongBao" className='w-100 btn btn-primary' >Thông báo</Link>
-                                </Col>
-                            </Row>
-                        </Container>
+            <Navbar className=" bg-light " id="admin-NavBar">
+                <Container className="d-flex justify-content-between w-100" id="admin-NavBar-Content" fluid>
+                    <Button variant="primary" onClick={handleShow}>
+                        Launch
+                    </Button>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            Xin chào {admin.name}
+                        </Dropdown.Toggle>
 
-                        <Container className="justify-content-center d-flex ps-0 pt-4 pb-4 border mt-4 border-3" >
+                        <Dropdown.Menu>
+                            <Dropdown.Item onClick={()=>console.log("Logout")}>LogOut</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Container>
+            </Navbar>
+            <Offcanvas show={show} onHide={handleClose}>
+                <Offcanvas.Header className="menu-header">
+                    <Offcanvas.Title className="w-100 text-center text-white" style={{textTransform:"uppercase",fontSize:"2em"}}>Quản lý lịch học</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body className="p-0 menu-body">
+                    <button className='NavButton rounded-0' onClick={()=>navigate("taikhoan")}><i className="bi bi-person"></i> Tài khoản</button>
+                    <button className='NavButton rounded-0' onClick={() => navigate("LichGiangDay")}><i className="bi bi-clock-history"></i> Lịch giản dạy</button>
+                    <button className='NavButton rounded-0' onClick={()=>navigate("ThongBao")}><i className="bi bi-send"></i> Thông báo</button>
+                </Offcanvas.Body>
+            </Offcanvas>
+
+                        <Container fluid className="justify-content-center d-flex pt-3" >
                             <Outlet context={{admin}}/>
                         </Container>
-                    </Container>
-                    :
-                    <>
-                        <Container fluid className="pt-5 d-flex flex-column justify-content-center align-items-center">
-                            <Container style={{maxWidth:'50%'}} className='pt-5 pb-5 rounded-5 border border-black border-3'>
-                                <Row>
-                                    <Col>
-                                        <h3 className='text-center'>Đăng nhập Admin</h3>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <FloatingLabel
-                                            controlId="floatingInput"
-                                            label="UserName"
-                                            className="mb-3"
-                                        >
-                                            <Form.Control onChange={(e)=>handleUsernameChange(e)} value={loginInfo.UserName} type="text" placeholder="username" />
-                                        </FloatingLabel>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-                                        <FloatingLabel controlId="floatingPassword" label="Password">
-                                            <Form.Control onChange={(e)=>handlePasswordChange(e)} type="password" placeholder="Password" />
-                                        </FloatingLabel>
-                                    </Col>
-                                </Row>
-                                <Row className='mt-2'>
-                                    <Col>
-                                        <Button href="/" className="w-100" variant="danger">Quay về </Button>
-                                    </Col>
-                                    <Col>
-                                        <Button onClick={()=> adminLogin()} className="w-100" variant="primary">Đăng nhập</Button>
-                                    </Col>
-                                </Row>
-
-                            </Container>
-                        </Container>
-                    </>
-                }
 
         </>
 
