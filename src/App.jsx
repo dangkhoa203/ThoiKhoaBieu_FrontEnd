@@ -12,9 +12,7 @@ function App() {
 
   return (
     <>
-      {isAdminPath ? "":
-          <NavBar></NavBar>
-      }
+
 
       <RouteComponent></RouteComponent>
     </>

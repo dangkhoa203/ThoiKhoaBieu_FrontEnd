@@ -12,13 +12,27 @@
 .NavButton:hover{
     background-color: #bbbecf;
     color: black;
+    border-bottom: 0;
     transition: 0.3s background-color ease-in-out;
+}
+.Menu-Button{
+    border: 0;
+    font-weight: bolder;
+    font-size: 1.5em;
+    background-color: transparent;
+    border-radius: 5px;
+    transition: 0.3s all ease-in-out;
+}
+.Menu-Button:hover{
+    background-color: #1D243A;
+    color: white;
+    transition: 0.3s all ease-in-out;
 }
 #admin-NavBar{
     box-shadow: 0 1px 7px 1px black;
 }
 #admin-NavBar-Content{
-    padding: 0 20px;
+    padding: 0 ;
 }
 .menu-body{
     background-color:#1D243A;
