@@ -9,10 +9,10 @@ export default function AdminThongBaoMenu(){
                 <Container className='justify-content-center d-flex' fluid>
                     <Row className="pt-3 w-75 justify-content-center">
                         <Col>
-                            <Link to="DanhSach" className='w-100 btn btn-primary' >Danh sách tài khoản</Link>
+                            <Link to="DanhSach" className='w-100 Menu-Navigation-Button' >Danh sách tài khoản</Link>
                         </Col>
                         <Col>
-                            <Link to="Gui" className='w-100 btn btn-primary' >Thêm tài khỏan</Link>
+                            <Link to="Gui" className='w-100 Menu-Navigation-Button' >Thêm tài khỏan</Link>
                         </Col>
                     </Row>
                 </Container>

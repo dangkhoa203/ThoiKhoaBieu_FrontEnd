@@ -1,5 +1,5 @@
 import {Link, matchPath, Outlet, useLocation, useNavigate} from "react-router";
-import {Button, Col, Container, Dropdown, FloatingLabel, Form, Navbar, Offcanvas, Row} from "react-bootstrap";
+import {Button, Col, Container, Dropdown, FloatingLabel, Form, Navbar, Offcanvas, Row, Stack} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import '/src/CSS/AdminNavBar.css'
 export default function Admin(){
@@ -29,13 +29,13 @@ export default function Admin(){
                     <button className="Menu-Button" style={{marginLeft:"10px"}} onClick={handleShow}>
                         <i className="bi bi-three-dots-vertical"></i>
                     </button>
-                    <Dropdown style={{marginRight:"20px"}}>
-                    <Dropdown.Toggle  id="dropdown-basic">
-                            Xin chào {admin.name}
+                    <Dropdown style={{marginRight:"10px"}}>
+                        <Dropdown.Toggle variant='outline-dark' className="rounded-0 border-0" style={{minWidth:"160px"}}  id="dropdown-basic">
+                            ADMIN
                         </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            <Dropdown.Item onClick={()=>console.log("Logout")}>LogOut</Dropdown.Item>
+                        <Dropdown.Menu   className="rounded-0 ">
+                            <Dropdown.Item as='button' onClick={()=>console.log("Logout")}>Đăng xuất</Dropdown.Item>
+                            <Dropdown.Item as='button' onClick={()=>navigate('/')}>Chế độ giảng viên </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </Container>
@@ -50,10 +50,18 @@ export default function Admin(){
                     <button className='NavButton rounded-0' onClick={()=>navigate("ThongBao")}><i className="bi bi-send"></i> Thông báo</button>
                 </Offcanvas.Body>
             </Offcanvas>
-            {isAdminPath ? <>Test</>:
-                <Container fluid className="justify-content-center d-flex pt-3" >
-                            <Outlet context={{admin}}/>
-                        </Container>
+            {isAdminPath ?
+                <Stack className="pt-3 justify-content-center align-content-center text-center">
+                    <h1>Xin chào Admin</h1>
+                    <Stack direction="horizontal" className="mx-auto" gap={3}>
+                        <Button variant='primary' onClick={()=>navigate("taikhoan")}>Tài khoản</Button>
+                        <Button variant='primary' onClick={() => navigate("LichGiangDay")}>Lịch giảng dạy</Button>
+                        <Button variant='primary' onClick={()=>navigate("ThongBao")}>Thông báo</Button>
+                    </Stack>
+                </Stack> :
+                <Container fluid className="justify-content-center flex-column d-flex pt-3" >
+                    <Outlet context={{admin}}/>
+                </Container>
             }
 
         </>

@@ -9,10 +9,10 @@ export default function AdminLichGiangDayMenu(){
                 <Container className='justify-content-center d-flex' fluid>
                     <Row className="pt-3 w-75 justify-content-center">
                         <Col>
-                            <Link to="DanhSach" className='w-100 btn btn-primary' >Danh sách lịch giảng</Link>
+                            <Link to="DanhSach" className='w-100 Menu-Navigation-Button' >Danh sách lịch giảng</Link>
                         </Col>
                         <Col>
-                            <Link to="Them" className='w-100 btn btn-primary' >Thêm lịch giảng</Link>
+                            <Link to="Them" className='w-100 Menu-Navigation-Button' >Thêm lịch giảng</Link>
                         </Col>
                     </Row>
                 </Container>

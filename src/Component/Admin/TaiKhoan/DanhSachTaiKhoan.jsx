@@ -94,6 +94,7 @@ export default function DanhSachTaiKhoan(){
     });
     return (
         <>
+            <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3">
                 <h3>
                     Danh sách tài khoản

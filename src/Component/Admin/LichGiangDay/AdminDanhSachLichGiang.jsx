@@ -94,20 +94,21 @@ export  default  function AdminDanhSachLichGiang(){
     });
     return (
         <>
+            <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3">
                 <h3>
                     Danh sách tài khoản
                 </h3>
                 <label htmlFor="search">
                     Search by Task:&nbsp;
-                    <input id="search" type="text" value={search} onChange={handleSearch} />
+                    <input id="search" type="text" value={search} onChange={handleSearch}/>
                 </label>
-                <select onChange={(e=>handleMode(e))} >
+                <select onChange={(e => handleMode(e))}>
                     <option value={1}>Task</option>
                     <option value={2}>Type</option>
                     <option value={3}>Tasks</option>
                 </select>
-                <br />
+                <br/>
                 <CompactTable columns={COLUMNS} theme={theme} data={data}/>
             </div>
         </>
