@@ -1,27 +1,30 @@
-import {Button, Container, Form, InputGroup} from "react-bootstrap";
+import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row} from "react-bootstrap";
+import {Link} from "react-router";
 
 export default function DatLaiMatKhau(){
     return(
-        <Container fluid>
+        <Container fluid className="px-lg-5">
             <hr className="my-3"/>
             <h1>Đặt lại mật khẩu Admin</h1>
-            <InputGroup className="mb-3">
-                <InputGroup.Text style={{minWidth:"130px"}} className="fw-bold text-center" >
-                    Password cũ
-                </InputGroup.Text>
-                <Form.Control
-                    placeholder="Mật khẩu"
-                />
-            </InputGroup>
-            <InputGroup className="mb-3">
-                <InputGroup.Text className="fw-bold text-center" style={{minWidth:"130px"}} >
-                    Password mới
-                </InputGroup.Text>
-                <Form.Control
-                    placeholder="Mật khẩu"
-                />
-            </InputGroup>
-            <Button className="w-50 fw-bolder rounded-pill " variant="dark">Thay đổi</Button>
+            <Row className="px-5">
+                <Col md={6}>
+                    <FloatingLabel
+                        label="Mật khẩu hiện tại"
+                        className="mb-3"
+                    >
+                        <Form.Control className="rounded-0" placeholder="password" />
+                    </FloatingLabel>
+                </Col>
+                <Col md={6}>
+                    <FloatingLabel
+                        label="Mật khẩu mới"
+                        className="mb-3"
+                    >
+                        <Form.Control className="rounded-0" placeholder="newpassword" />
+                    </FloatingLabel>
+                </Col>
+            </Row>
+            <Button className=" fw-bolder rounded-0 " style={{width:"300px"}} variant="dark">Thay đổi</Button>
         </Container>
     )
 }

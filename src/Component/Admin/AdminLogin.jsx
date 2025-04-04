@@ -1,7 +1,10 @@
 import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row} from "react-bootstrap";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {useNavigate, useOutletContext} from "react-router";
 
 export default function AdminLogin(){
+    const {admin}=useOutletContext()
+    const navigate = useNavigate();
     const [loginInfo,setLoginInfo] = useState({
         UserName:"",
         Password:"",
@@ -28,8 +31,15 @@ export default function AdminLogin(){
             }
         }
     }
+    useEffect(() => {
+        console.log(admin);
+        if(admin.islog){
+            navigate("/admin");
+        }
+    },[])
+
     return(
-        <Container style={{height:"100vh"}} fluid className="d-flex flex-column  justify-content-center align-items-center">
+        <Container style={{height:"100%"}} fluid className="d-flex p-0 flex-column  justify-content-center align-items-center">
             <Container className='Login-Panel pb-5  '>
                 <Row className="LoginHero">
                     <Col>

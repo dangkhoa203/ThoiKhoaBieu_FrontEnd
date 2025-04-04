@@ -12,7 +12,7 @@ export default function TaiKhoanMenu(){
                             <Link to="DanhSach" className='w-100 Menu-Navigation-Button' >Danh sách tài khoản</Link>
                         </Col>
                         <Col>
-                            <Link to="Them" className='w-100 Menu-Navigation-Button' >Thêm tài khỏan</Link>
+                            <Link to="Them" className='w-100 Menu-Navigation-Button' >Thêm tài khoản</Link>
                         </Col>
                         <Col>
                             <Link to="DatMatKhau" className='w-100 Menu-Navigation-Button' >Đặt lại mật khẩu Admin</Link>

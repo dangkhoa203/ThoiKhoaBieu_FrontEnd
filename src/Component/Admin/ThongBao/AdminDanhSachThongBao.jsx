@@ -1,75 +1,52 @@
 import {useState} from "react";
 import {useTheme} from "@table-library/react-table-library/theme";
 import {CompactTable} from "@table-library/react-table-library/compact";
+import {useNavigate} from "react-router";
+import {Button, Container, Modal, Spinner} from "react-bootstrap";
 
 export default function AdminDanhSachThongBao(){
+    const navigate = useNavigate();
+    const [deleteModal, setDeleteModal] = useState({id:"",name:""});
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = (id,name) =>{
+        setDeleteModal({id:id,name:name});
+        setShow(true);}
+    const handleDelete = (id) =>{
+        console.log(id)
+        handleClose()
+    }
+    const [loading, setLoading] = useState(false);
     const [nodes,setNodes] = useState( [
         {
-            id: '0',
-            name: 'Shopping List',
-            deadline: new Date(2020, 1, 15),
-            type: 'TASK',
-            isComplete: true,
-            nodes: 3,
+            id:'1',
+            message:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAA",
+        },
+        {
+            id:'2',
+            message:"B",
         },
     ]);
-    const [mode, setMode] = useState(1)
-    const [search, setSearch] = useState("");
 
-    const handleSearch = (event) => {
-        setSearch(event.target.value);
-
-    };
-    const handleMode = (event) => {
-        setMode(event.target.value);
-        console.log(event.target.value);
-    };
-    let data={nodes}
-    data={ nodes: data.nodes.filter((item) =>{
-                switch (mode){
-                    case "1":
-                        return  item.name.toLowerCase().includes(search.toLowerCase())
-                    case "2":
-                        console.log(search)
-                        return item.type.toLowerCase().includes(search.toLowerCase())
-
-                    case "3":
-                        console.log(search)
-                        return item.nodes.toString()===search
-
-                    default:
-                        return item.name.toLowerCase().includes(search.toLowerCase())
-
-                }
-
-            }
-        ),
-    }
-
+    const data={nodes}
     const COLUMNS = [
-        { label: 'Task', renderCell: (item) => item.name },
-        {
-            label: 'Deadline',
-            renderCell: (item) =>
-                item.deadline.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                }),
-        },
-        { label: 'Type', renderCell: (item) => item.type },
-        {
-            label: 'Complete',
-            renderCell: (item) => item.isComplete.toString(),
-        },
-        { label: 'Tasks', renderCell: (item) => item.nodes },
+        { label: 'ID', renderCell: (item) => item.id },
+        { label: 'Thông báo', renderCell: (item) => item.message },
+        {label: '',renderCell: (item) => <div className="gap-2 d-flex justify-content-center align-items-center">
+                <Button variant="primary" style={{width:"100px"}}  onClick={()=>handleShow(item.id,item.name)}>Xem</Button>
+                <Button variant="danger" style={{width:"100px"}}  onClick={()=>handleShow(item.id,item.name)}>Xóa</Button>
+                <Button variant="success" style={{width:"100px"}} onClick={()=>{
+                    navigate(`../Gui/${item.id}`)
+                }} >Gửi</Button>
+            </div>},
     ];
     const theme = useTheme({
         HeaderRow: `
         .th {
           border: 1px solid black;
           border-bottom: 3px solid black;
-           background-color: #eaf5fd;
+           background-color: #f2a099;
+           text-align: center;
         }
       `,
         BaseCell: `
@@ -79,38 +56,55 @@ export default function AdminDanhSachThongBao(){
         cursor: pointer;
         .td {
           border: 1px solid black;
-          
-          background-color: #9eb0f7;
+          font-size:1.1em;
+          font-weight: lighter;
+          background-color: #1D243A;
+          color: white;
+           transition: 0.3s all ease-in-out;
+           text-overflow: ellipsis;
+           max-width: 550px;
         }
 
         &:hover .td {
-          border-top: 1px solid orange;
-          border-bottom: 1px solid orange;
+          background-color: #434656;
+           transition: 0.3s all ease-in-out;
         }
       `,
         Table: `
-        
+                --data-table-library_grid-template-columns:  1fr 1fr 1fr ;
       `,
     });
     return (
-        <>
+        <Container fluid>
             <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3">
                 <h3>
                     Danh sách tài khoản
                 </h3>
-                <label htmlFor="search">
-                    Search by Task:&nbsp;
-                    <input id="search" type="text" value={search} onChange={handleSearch} />
-                </label>
-                <select onChange={(e=>handleMode(e))} >
-                    <option value={1}>Task</option>
-                    <option value={2}>Type</option>
-                    <option value={3}>Tasks</option>
-                </select>
-                <br />
-                <CompactTable columns={COLUMNS} theme={theme} data={data}/>
+                {loading ? <div className="mx-auto"> <Spinner variant="info"  animation="grow" /> <Spinner variant="danger"  animation="grow" />  <Spinner  animation="grow" />  </div> :
+                    <Container><CompactTable layout={{custom: true, horizontalScroll: true}} columns={COLUMNS} theme={theme} data={data}/></Container>
+                }
+
             </div>
-        </>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header>
+                    <Modal.Title>Xóa {deleteModal.id} </Modal.Title>
+                </Modal.Header>
+                <Modal.Body >
+                    <p>Bạn có muốn xóa {deleteModal.name}</p>
+                </Modal.Body >
+                <Modal.Footer>
+                    <Button className="w-25" variant="outline-secondary" onClick={handleClose}>
+                        Hủy
+                    </Button>
+                    <Button className='w-25' variant="danger" onClick={()=>handleDelete(deleteModal.id)}>Xóa</Button>
+                </Modal.Footer>
+            </Modal>
+        </Container>
     )
 }

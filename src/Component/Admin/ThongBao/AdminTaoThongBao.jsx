@@ -1,6 +1,6 @@
-import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row} from "react-bootstrap";
+import {Button, Col, Container, FloatingLabel, Form, Row} from "react-bootstrap";
 
-export default function TaoTaiKhoan(){
+export default function AdminTaoThongBao(){
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
