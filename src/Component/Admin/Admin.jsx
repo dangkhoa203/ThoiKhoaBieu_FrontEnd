@@ -57,6 +57,8 @@ export default function Admin(){
                     <button className='NavButton rounded-0' onClick={()=>navigate("Phong")}><i className="bi bi-person-workspace"></i> Phòng học</button>
                     <button className='NavButton rounded-0' onClick={()=>navigate("MonHoc")}><i className="bi bi-backpack2"></i> Môn học</button>
                     <button className='NavButton rounded-0' onClick={()=>navigate("CaHoc")}><i className="bi bi-table"></i> Ca học</button>
+                    <button className='NavButton rounded-0' onClick={() => navigate("LopHoc")}><i className="bi bi-book"></i> Lớp học
+                    </button>
                 </Offcanvas.Body>
             </Offcanvas>
             {isAdminPath ?

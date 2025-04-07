@@ -2,28 +2,39 @@ import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner} f
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 
-export default function AdminThemLichGiang(){
-    let curr = new Date();
-    curr.setDate(curr.getDate()+1);
-    const date = curr.toISOString().substring(0,10);
-    const [data, setData] = useState({class_id:0,room_id:0,shift_id:0,dayOfWeek:date});
-    const [classData, setClassData] = useState([]);
+export default function TaoLopHoc(){
+    const [data, setData] = useState({subject_id:0,room_id:0,user_id:0,shift_id:0});
+    const [subjectData, setSubjectData] = useState([]);
     const [roomData, setRoomData] = useState([]);
+    const [userData, setUserData] = useState([]);
     const [shiftData, setShiftData] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const handleClass=(e)=>{
-        setData({...data, class_id: e.target.value});
+    const handleSubject=(e)=>{
+        setData({...data, subject_id: e.target.value});
     }
     const handleRoom=(e)=>{
         setData({...data, room_id: e.target.value});
     }
-    const handleDay=(e)=>{
-        setData({...data, dayOfWeek:e.target.value});
+    const handleUser=(e)=>{
+        setData({...data, user_id:e.target.value});
     }
     const handleShift=(e)=>{
         setData({...data, shift_id: e.target.value});
+    }
+    const getSubjectData=async()=>{
+        const response = await fetch('http://localhost:8080/subjects', {
+            headers: {'Content-Type': 'application/json'},
+            method:"GET",
+            credentials:'include'
+        });
+        const content = await response.json();
+        if (!response.ok) {
+            console.log(content.message);
+        }else {
+            setSubjectData(content.result);
+        }
     }
     const getRoomData=async()=>{
         const response = await fetch('http://localhost:8080/rooms', {
@@ -38,8 +49,8 @@ export default function AdminThemLichGiang(){
             setRoomData(content.result);
         }
     }
-    const getClassData=async()=>{
-        const response = await fetch('http://localhost:8080/classess', {
+    const getUserData=async()=>{
+        const response = await fetch('http://localhost:8080/users', {
             headers: {'Content-Type': 'application/json'},
             method:"GET",
             credentials:'include'
@@ -48,7 +59,7 @@ export default function AdminThemLichGiang(){
         if (!response.ok) {
             console.log(content.message);
         }else {
-            setClassData(content.result);
+            setUserData(content.result);
         }
     }
     const getShiftData=async()=>{
@@ -74,13 +85,12 @@ export default function AdminThemLichGiang(){
     }
     const submit=async ()=>{
         setLoading(true);
-        const request={...data,dayOfWeek:new Date(data.dayOfWeek).toISOString()};
         if(checkData()) {
-            const response = await fetch('http://localhost:8080/classSchedules/create', {
+            const response = await fetch('http://localhost:8080/classess/create', {
                 headers: {'Content-Type': 'application/json'},
                 method: "POST",
                 credentials: 'include',
-                body: JSON.stringify(request),
+                body: JSON.stringify(data),
             });
             const content = await response.json();
             if (!response.ok) {
@@ -92,11 +102,11 @@ export default function AdminThemLichGiang(){
         setLoading(false);
     }
     useEffect(()=>{
+        getSubjectData()
         getRoomData()
-        getClassData()
+        getUserData()
         getShiftData()
     },[])
-
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
@@ -104,10 +114,10 @@ export default function AdminThemLichGiang(){
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6}  xs={12}>
                     <FloatingLabel className="mb-3" label="Môn học">
-                        <Form.Select onClick={handleClass} className="rounded-0" >
+                        <Form.Select onClick={handleSubject} className="rounded-0" >
                             <option selected disabled value="">Open this select menu</option>
-                            {classData.map((item, index) => (
-                                <option key={index} value={item.classId}>{`${item.user.username} - ${item.subject.subjectName}`}</option>
+                            {subjectData.map((item, index) => (
+                                <option key={index} value={item.subjectId}>{item.subjectName}</option>
                             ))}
                         </Form.Select>
                     </FloatingLabel>
@@ -123,6 +133,16 @@ export default function AdminThemLichGiang(){
                     </FloatingLabel>
                 </Col>
                 <Col sm={6}  xs={12}>
+                    <FloatingLabel className="mb-3" label="Giảng viên">
+                        <Form.Select onChange={handleUser} className="rounded-0" >
+                            <option selected disabled value="">Open this select menu</option>
+                            {userData.map((item, index) => (
+                                <option key={index} value={item.userId}>{item.fullname}</option>
+                            ))}
+                        </Form.Select>
+                    </FloatingLabel>
+                </Col>
+                <Col sm={6}  xs={12}>
                     <FloatingLabel className="mb-3" label="Ca">
                         <Form.Select onChange={handleShift} className="rounded-0" >
                             <option selected disabled value="">Open this select menu</option>
@@ -130,13 +150,6 @@ export default function AdminThemLichGiang(){
                                 <option key={index} value={item.shiftId}>{item.shiftName} ({`${item.startTime} -> ${item.endTime}`})</option>
                             ))}
                         </Form.Select>
-                    </FloatingLabel>
-                </Col>
-                <Col sm={6}  xs={12}>
-                    <FloatingLabel label="Tên ca" className="mb-3"
-                    >
-                        <Form.Control  value={data.dayOfWeek} onChange={handleDay} className="rounded-0"  type="date"
-                                       placeholder="phong"/>
                     </FloatingLabel>
                 </Col>
             </Row>

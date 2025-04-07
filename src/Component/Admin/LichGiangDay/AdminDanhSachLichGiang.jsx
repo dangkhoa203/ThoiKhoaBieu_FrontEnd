@@ -1,79 +1,102 @@
 import {useTheme} from "@table-library/react-table-library/theme";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {CompactTable} from "@table-library/react-table-library/compact";
-import {Button, Container, Modal} from "react-bootstrap";
+import {Button, Container, Modal, Spinner} from "react-bootstrap";
 import {useNavigate} from "react-router";
+import {SortToggleType, useSort} from "@table-library/react-table-library/sort";
+import {usePagination} from "@table-library/react-table-library/pagination";
 
 export  default  function AdminDanhSachLichGiang(){
     const navigate = useNavigate();
-    const [deleteModal, setDeleteModal] = useState({name:""});
+    const [deleteModal, setDeleteModal] = useState({id:""});
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
     const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = (name) =>{
-        setDeleteModal({name:name});
+    const handleClose = () => {
+        setShow(false);
+    };
+    const handleShow = (id) =>{
+        setDeleteModal({id:id});
         setShow(true);}
-    const [nodes,setNodes] = useState( [
-        {
-            id: '0',
-            name: 'Shopping List',
-            deadline: new Date(2020, 1, 15),
-            type: 'TASK',
-            isComplete: true,
-            nodes: 3,
-        },
-        {
-            id: '1',
-            name: 'Shopping',
-            deadline: new Date(2020, 1, 15),
-            type: 'TASK',
-            isComplete: true,
-            nodes: 3,
-        },
-    ]);
-    const newdata=[
-        {
-            ID:"1",
-            Nhom:"1",
-            TO_TH:"1",
-            MSCB:"1",
-            MALOP:"1",
-            SISO:1,
-            THU:2,
-            TIETHOC:"1",
-            THOIGIANHOC_BD:"1",
-            THOIGIANHOC_KT:"1",
-            MAPM:"1",
-            HOCKY:'1',
-            NAMHOC:"1",
-            TUAN:"1"
+    const deleteData= async ()=>{
+        if(show) {
+            try {
+                setDeleteLoading(true);
+                setDeleteError("");
+                const response = await fetch(`http://localhost:8080/classSchedules/delete/${deleteModal.id}`, {
+                    headers: {'Content-Type': 'application/json'},
+                    method: "DELETE",
+                });
+                const content = await response.json();
+                if (!response.ok) {
+                    setDeleteError(content.message);
+                } else {
+                    getData()
+                    handleClose()
+                }
+            } catch (error) {
+                setDeleteError("Lỗi server!")
+            } finally {
+                setDeleteLoading(false);
+            }
         }
-    ]
+    }
+    //Dữ liệu
+    const [nodes,setNodes] = useState( [
 
+    ]);
+    const getData=async ()=>{
+        const response = await fetch('http://localhost:8080/classSchedules', {
+            headers: {'Content-Type': 'application/json'},
+            method:"GET",
+            credentials:'include'
+        });
+        const content = await response.json();
+        if (!response.ok) {
+            console.log(content.message);
+        }else {
+            setNodes(content.result);
+        }
+    }
+    useEffect(()=>{
+        getData();
+    },[])
     let data={nodes}
-
-
+    const sort = useSort(
+        data,
+        {
+            onChange: onSortChange,
+        },
+        {
+            sortToggleType: SortToggleType.AlternateWithReset,
+            sortFns: {
+                id: (array) => array.sort((a, b) => a.subjectId - b.subjectId),
+                ten: (array) => array.sort((a, b) => a.subjectName.localeCompare(b.subjectName)),
+                mota: (array) => array.sort((a, b) => a.description.localeCompare(b.description)),
+                ngaytao: (array) => array.sort((a, b) => a.createdAt - b.createdAt),
+                ngaysua: (array) => array.sort((a, b) => a.updatedAt - b.updatedAt),
+            },
+        }
+    );
+    function onSortChange(action, state) {}
+    const pagination = usePagination(data, {
+        state: {
+            page: 0,
+            size: 10,
+        },
+        onChange: onPaginationChange,
+    });
+    function onPaginationChange(action, state) {}
     const COLUMNS = [
-        { label: 'Task', renderCell: (item) => item.name },
-        {
-            label: 'Deadline',
-            renderCell: (item) =>
-                item.deadline.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                }),
-        },
-        { label: 'Type', renderCell: (item) => item.type },
-        {
-            label: 'Complete',
-            renderCell: (item) => item.isComplete.toString(),
-        },
-        { label: 'Tasks', renderCell: (item) => item.nodes },
+        { label: 'Tên môn học', renderCell: (item) => item.classes.subject.subjectName,sort: { sortKey: "ten" } },
+        { label: 'Giảng viên', renderCell: (item) => item.classes.user.fullname,sort: { sortKey: "soluong" } },
+        { label: 'Phòng', renderCell: (item) =>item.room.roomName},
+        { label: 'Địa điểm', renderCell: (item) =>item.room.location},
+        { label: 'Giờ bắt đầu', renderCell: (item) =>item.shift.startTime},
+        { label: 'Giờ kết thúc', renderCell: (item) =>item.shift.endTime},
+        { label: 'Thứ', renderCell: (item) =>item.dayOfWeek},
         {label: '',renderCell: (item) => <div className="gap-2 d-flex justify-content-center align-items-center">
-                <Button variant="danger" className="rounded-pill" onClick={()=>handleShow(item.name)}>Delete</Button>
-                <Button variant="secondary" className="rounded-pill" onClick={()=>{
-                    navigate(`../sua/${item.name}`)
-                }} >Update</Button>
+                <Button variant="danger" style={{width:"70px"}} className="rounded-pill" onClick={()=>handleShow(item.scheduleId)}>Xóa</Button>
             </div>},
     ];
     const theme = useTheme({
@@ -83,6 +106,10 @@ export  default  function AdminDanhSachLichGiang(){
           border-bottom: 3px solid black;
            background-color: #f2a099;
            text-align: center;
+           div{
+           margin: auto;
+           }
+           
         }
       `,
         BaseCell: `
@@ -105,18 +132,40 @@ export  default  function AdminDanhSachLichGiang(){
         }
       `,
         Table: `
-                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr ;
+                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
       `,
     });
     return (
         <>
             <hr className="my-3"/>
-            <div className="container-fluid d-flex flex-column gap-3">
+            <div className="container-fluid d-flex flex-column gap-3 pb-3">
                 <h3>
-                    Danh sách tài khoản
+                    Danh sách môn học
                 </h3>
                 <Container>
-                    <CompactTable layout={{custom: true, horizontalScroll: true}} columns={COLUMNS} theme={theme} data={data}/>
+                    <CompactTable layout={{custom: true, horizontalScroll: true}}
+                                  pagination={pagination} sort={sort} columns={COLUMNS}
+                                  theme={theme} data={data}/>
+                    {nodes.length === 0 ? <p className="text-center">Không có dữ liệu </p> :
+                        <div className="d-flex justify-content-end">
+                           <span>
+                                Trang:{" "}
+                               {pagination.state.getPages(data.nodes).map((_, index) => (
+                                   <button
+                                       className={`btn ${pagination.state.page === index ? "btn-primary" : "btn-outline-primary"} btn-sm`}
+                                       key={index}
+                                       type="button"
+                                       style={{
+                                           marginRight: "5px",
+                                           fontWeight: pagination.state.page === index ? "bold" : "normal",
+                                       }}
+                                       onClick={() => pagination.fns.onSetPage(index)}
+                                   >
+                                       {index + 1}
+                                   </button>
+                               ))}
+                           </span>
+                        </div>}
                 </Container>
             </div>
             <Modal
@@ -126,17 +175,24 @@ export  default  function AdminDanhSachLichGiang(){
                 keyboard={false}
             >
                 <Modal.Header>
-                    <Modal.Title>Xóa {deleteModal.name} </Modal.Title>
+                    <Modal.Title>Xóa {deleteModal.id} </Modal.Title>
                 </Modal.Header>
                 <Modal.Body >
-                    I will not close if you click outside me. Do not even try to press
-                    escape key.
+                    Bạn có muốn xóa {deleteModal.id}
+                    <p className="text-danger h4 text-center">{deleteError}</p>
                 </Modal.Body >
                 <Modal.Footer>
-                    <Button className="w-25" variant="outline-secondary" onClick={handleClose}>
+                    <Button className="w-25" variant="outline-secondary" disabled={deleteLoading} onClick={handleClose}>
                         Hủy
                     </Button>
-                    <Button className='w-25' variant="danger">Xóa</Button>
+                    <Button className='w-25' style={{fontSize:"1em"}} onClick={()=>deleteData()} disabled={deleteLoading} variant="danger">
+                        {deleteLoading ?
+                            <>
+                                <Spinner size="sm" animation="border" variant="light" />
+                                Loading
+                            </>
+                            :"Xóa"}
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </>

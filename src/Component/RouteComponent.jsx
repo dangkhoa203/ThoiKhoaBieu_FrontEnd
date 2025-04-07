@@ -25,11 +25,23 @@ import MonHocMenu from "./Admin/MonHoc/MonHocMenu.jsx";
 import DanhSachMonHoc from "./Admin/MonHoc/DanhSachMonHoc.jsx";
 import TaoMonHoc from "./Admin/MonHoc/TaoMonHoc.jsx";
 import SuaMonHoc from "./Admin/MonHoc/SuaMonHoc.jsx";
+import LopHocMenu from "./Admin/LopHoc/LopHocMenu.jsx";
+import DanhSachLopHoc from "./Admin/LopHoc/DanhSachLopHoc.jsx";
+import TaoLopHoc from "./Admin/LopHoc/TaoLopHoc.jsx";
+import SuaLopHoc from "./Admin/LopHoc/SuaLopHoc.jsx";
+import AdminThemLichGiang from "./Admin/LichGiangDay/AdminThemLichGiang.jsx";
+import HomePage from "./home/HomePage.jsx";
+import Schedule from "./user/schedule.jsx";
+import Register from "./user/register.jsx";
+import React from "react";
 
 export default function RouteComponent(){
     return (
         <Routes>
-            <Route element={<><p>Test</p>  </>} path="/"/>
+            <Route element={<HomePage/>} path="/">
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/register" element={<Register />} />
+            </Route>
             <Route element={<Test/>} path="/test"/>
 
             <Route path="/Admin" element={<Admin> </Admin>}>
@@ -42,7 +54,7 @@ export default function RouteComponent(){
                 </Route>
                 <Route path="LichGiangDay" element={ <AdminLichGiangDayMenu/> } >
                     <Route path="DanhSach" element={ <AdminDanhSachLichGiang/> }/>
-                    <Route path="Them" element={ <TaoPhong/> }/>
+                    <Route path="Them" element={ <AdminThemLichGiang/> }/>
                     <Route path="Sua/:id" element={ <SuaPhong/> }/>
                 </Route>
                 <Route path="ThongBao" element={ <AdminThongBaoMenu/> } >
@@ -69,6 +81,11 @@ export default function RouteComponent(){
                     <Route path="DanhSach" element={ <DanhSachMonHoc/> }/>
                     <Route path="Them" element={ <TaoMonHoc/> }/>
                     <Route path="Sua/:id" element={ <SuaMonHoc/> } />
+                </Route>
+                <Route path="LopHoc" element={ <LopHocMenu/> } >
+                    <Route path="DanhSach" element={ <DanhSachLopHoc/> }/>
+                    <Route path="Them" element={ <TaoLopHoc/> }/>
+                    <Route path="Sua/:id" element={ <SuaLopHoc/> } />
                 </Route>
             </Route>
         </Routes>

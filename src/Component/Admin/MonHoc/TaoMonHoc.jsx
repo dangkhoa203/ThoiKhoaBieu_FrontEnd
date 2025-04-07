@@ -16,7 +16,7 @@ export default function TaoMonHoc(){
 
     const checkData=()=>{
         setErrorMessage("")
-        if(data.subjectName.length<=0||data.description.length<=0){
+        if(data.subjectName.length<=0){
             setErrorMessage("Chưa nhập thông tin đầy đủ");
             return false;
         }
