@@ -1,17 +1,42 @@
 import {useTheme} from "@table-library/react-table-library/theme";
 import {useEffect, useState} from "react";
 import {CompactTable} from "@table-library/react-table-library/compact";
-import {Button, Container, Modal, Spinner} from "react-bootstrap";
+import {Button, Container, Dropdown, DropdownButton, Form, InputGroup, Modal, Spinner} from "react-bootstrap";
 import {useNavigate} from "react-router";
 import {SortToggleType, useSort} from "@table-library/react-table-library/sort";
 import {usePagination} from "@table-library/react-table-library/pagination";
 
-export  default  function AdminDanhSachLichGiang(){
+export  default  function AdminDanhSachLichGiang(props){
     const navigate = useNavigate();
     const [deleteModal, setDeleteModal] = useState({id:""});
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState("");
     const [show, setShow] = useState(false);
+    const [mode, setMode] = useState(1)
+    const [search, setSearch] = useState("");
+    const [searchLabel, setSearchLabel] = useState("Môn học");
+
+    useEffect(() => {
+        console.log(searchLabel)
+        switch (mode){
+            case 1:
+                setSearchLabel("Môn học");
+                break;
+            case 2:
+                setSearchLabel("Giảng viên");
+                break;
+            case 3:
+                setSearchLabel("Phòng");
+                break;
+            case 4:
+                setSearchLabel("Thứ");
+                break;
+            default:
+                setSearchLabel("Môn học");
+                break;
+
+        }
+    },[mode])
     const handleClose = () => {
         setShow(false);
     };
@@ -24,7 +49,7 @@ export  default  function AdminDanhSachLichGiang(){
                 setDeleteLoading(true);
                 setDeleteError("");
                 const response = await fetch(`http://localhost:8080/classSchedules/delete/${deleteModal.id}`, {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                     method: "DELETE",
                 });
                 const content = await response.json();
@@ -47,7 +72,7 @@ export  default  function AdminDanhSachLichGiang(){
     ]);
     const getData=async ()=>{
         const response = await fetch('http://localhost:8080/classSchedules', {
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
             method:"GET",
             credentials:'include'
         });
@@ -62,6 +87,26 @@ export  default  function AdminDanhSachLichGiang(){
         getData();
     },[])
     let data={nodes}
+    data={ nodes: data.nodes.filter((item) =>{
+                switch (mode){
+                    case 1:
+                        return  item.subjectName.toLowerCase().includes(search.toLowerCase())
+                    case 2:
+                        return item.userName.toLowerCase().includes(search.toLowerCase())
+
+                    case 3:
+                        return item.roomName.toLowerCase().includes(search.toLowerCase())
+                    case 4:
+                        return item.dayOfWeek.toLowerCase().includes(search.toLowerCase())
+
+                    default:
+                        return item.subjectName.toLowerCase().includes(search.toLowerCase())
+
+                }
+
+            }
+        ),
+    }
     const sort = useSort(
         data,
         {
@@ -70,11 +115,13 @@ export  default  function AdminDanhSachLichGiang(){
         {
             sortToggleType: SortToggleType.AlternateWithReset,
             sortFns: {
-                id: (array) => array.sort((a, b) => a.subjectId - b.subjectId),
-                ten: (array) => array.sort((a, b) => a.subjectName.localeCompare(b.subjectName)),
-                mota: (array) => array.sort((a, b) => a.description.localeCompare(b.description)),
-                ngaytao: (array) => array.sort((a, b) => a.createdAt - b.createdAt),
-                ngaysua: (array) => array.sort((a, b) => a.updatedAt - b.updatedAt),
+                tenmh: (array) => array.sort((a, b) => a.subjectName.localeCompare(b.subjectName)),
+                gv: (array) => array.sort((a, b) => a.userName.localeCompare(b.userName)),
+                phong: (array) => array.sort((a, b) => a.roomName.localeCompare(b.roomName)),
+                diadiem: (array) => array.sort((a, b) => a.location.localeCompare(b.location)),
+                gbd: (array) => array.sort((a, b) => a.startTime.localeCompare(b.startTime)),
+                gkt: (array) => array.sort((a, b) => a.endTime.localeCompare(b.endTime)),
+                thu: (array) => array.sort((a, b) => a.dayOfWeek.localeCompare(b.dayOfWeek)),
             },
         }
     );
@@ -82,19 +129,23 @@ export  default  function AdminDanhSachLichGiang(){
     const pagination = usePagination(data, {
         state: {
             page: 0,
-            size: 10,
+            size: 5,
         },
         onChange: onPaginationChange,
     });
+    const handleSearch = (event) => {
+        setSearch(event.target.value);
+        pagination.fns.onSetPage(0)
+    };
     function onPaginationChange(action, state) {}
     const COLUMNS = [
-        { label: 'Tên môn học', renderCell: (item) => item.classes.subject.subjectName,sort: { sortKey: "ten" } },
-        { label: 'Giảng viên', renderCell: (item) => item.classes.user.fullname,sort: { sortKey: "soluong" } },
-        { label: 'Phòng', renderCell: (item) =>item.room.roomName},
-        { label: 'Địa điểm', renderCell: (item) =>item.room.location},
-        { label: 'Giờ bắt đầu', renderCell: (item) =>item.shift.startTime},
-        { label: 'Giờ kết thúc', renderCell: (item) =>item.shift.endTime},
-        { label: 'Thứ', renderCell: (item) =>item.dayOfWeek},
+        { label: 'Tên môn học', renderCell: (item) => item.subjectName,sort: { sortKey: "tenmh" } },
+        { label: 'Giảng viên', renderCell: (item) => item.userName,sort: { sortKey: "gv" } },
+        { label: 'Phòng', renderCell: (item) =>item.roomName,sort: { sortKey: "phong" }},
+        { label: 'Địa điểm', renderCell: (item) =>item.location,sort: { sortKey: "diadiem" }},
+        { label: 'Giờ bắt đầu', renderCell: (item) =>item.startTime,sort: { sortKey: "gbd" }},
+        { label: 'Giờ kết thúc', renderCell: (item) =>item.endTime,sort: { sortKey: "gkt" }},
+        { label: 'Thứ', renderCell: (item) =>item.dayOfWeek,sort: { sortKey: "thu" }},
         {label: '',renderCell: (item) => <div className="gap-2 d-flex justify-content-center align-items-center">
                 <Button variant="danger" style={{width:"70px"}} className="rounded-pill" onClick={()=>handleShow(item.scheduleId)}>Xóa</Button>
             </div>},
@@ -135,14 +186,37 @@ export  default  function AdminDanhSachLichGiang(){
                 --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
       `,
     });
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return (
         <>
             <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3 pb-3">
-                <h3>
-                    Danh sách môn học
-                </h3>
+                <h1 className="page-header">
+                    Lịch học
+                </h1>
                 <Container>
+                    <Container className="d-flex p-0 justify-content-end" fluid>
+                        <InputGroup style={{width:"400px"}} className="mb-3 rounded-0">
+                            <DropdownButton
+                                variant="dark"
+                                title={searchLabel}
+
+                            >
+                                <Dropdown.Item onClick={()=>setMode(1)}>Môn học</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(2)}>Giảng viên</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(3)}>Phòng</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(4)}>Thứ</Dropdown.Item>
+                            </DropdownButton>
+                            <Form.Control value={search} placeholder="Search" onChange={handleSearch}  />
+                        </InputGroup>
+                    </Container>
                     <CompactTable layout={{custom: true, horizontalScroll: true}}
                                   pagination={pagination} sort={sort} columns={COLUMNS}
                                   theme={theme} data={data}/>

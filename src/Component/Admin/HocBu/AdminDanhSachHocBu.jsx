@@ -1,43 +1,47 @@
+import {useNavigate} from "react-router";
 import {useEffect, useState} from "react";
+import {Button, Container, Dropdown, DropdownButton, Form, InputGroup, Modal, Spinner} from "react-bootstrap";
 import {useTheme} from "@table-library/react-table-library/theme";
 import {CompactTable} from "@table-library/react-table-library/compact";
-import {Button, Container, Dropdown, DropdownButton, Form, InputGroup, Modal, Spinner} from "react-bootstrap";
-import {useNavigate} from "react-router";
 import {SortToggleType, useSort} from "@table-library/react-table-library/sort";
 import {usePagination} from "@table-library/react-table-library/pagination";
 
-export default function DanhSachTaiKhoan(props){
+export default function AdminDanhSachHocBu(props){
     const navigate = useNavigate();
     const [deleteModal, setDeleteModal] = useState({id:"",name:""});
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState("");
     const [show, setShow] = useState(false);
+    const [declineLoading, setDeclineLoading] = useState(false);
+    const handleClose = () => {
+        setShow(false);
+        setDeleteError("")
+    };
     const [mode, setMode] = useState(1)
     const [search, setSearch] = useState("");
-    const [searchLabel, setSearchLabel] = useState("Username");
+    const [searchLabel, setSearchLabel] = useState("Tên giảng viên");
 
     useEffect(() => {
         console.log(searchLabel)
         switch (mode){
             case 1:
-                setSearchLabel("Username");
+                setSearchLabel("Tên giảng viên");
                 break;
             case 2:
-                setSearchLabel("Fullname");
+                setSearchLabel("Tên môn học");
                 break;
             case 3:
-                setSearchLabel("Email");
+                setSearchLabel("Tên phòng");
                 break;
-
+            case 4:
+                setSearchLabel("Lý do");
+                break;
             default:
                 setSearchLabel("Username");
                 break;
 
         }
     },[mode])
-    const handleClose = () => {
-        setShow(false);
-    };
     const handleShow = (id,name) =>{
         setDeleteModal({id:id,name:name});
         setShow(true);}
@@ -46,7 +50,7 @@ export default function DanhSachTaiKhoan(props){
             try {
                 setDeleteLoading(true);
                 setDeleteError("");
-                const response = await fetch(`http://localhost:8080/users/delete/${deleteModal.id}`, {
+                const response = await fetch(`http://localhost:8080/makeups/delete/${deleteModal.id}`, {
                     headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                     method: "DELETE",
                 });
@@ -64,12 +68,33 @@ export default function DanhSachTaiKhoan(props){
             }
         }
     }
+    const declineRequest=async (id)=>{
+        try {
+            setDeclineLoading(true);
+            const response = await fetch(`http://localhost:8080/makeups/update/reject/${id}`, {
+                headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
+                method: "PUT",
+                credentials:"include"
+            });
+            const content = await response.json();
+            if (!response.ok) {
+                setDeleteError(content.message);
+            } else {
+                getData()
+                handleClose()
+            }
+        } catch (error) {
+
+        } finally {
+            setDeclineLoading(false);
+        }
+    }
     //Dữ liệu
     const [nodes,setNodes] = useState( [
 
     ]);
     const getData=async ()=>{
-        const response = await fetch('http://localhost:8080/users', {
+        const response = await fetch('http://localhost:8080/makeups', {
             headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
             method:"GET",
             credentials:'include'
@@ -88,15 +113,15 @@ export default function DanhSachTaiKhoan(props){
     data={ nodes: data.nodes.filter((item) =>{
                 switch (mode){
                     case 1:
-                        return  item.username.toLowerCase().includes(search.toLowerCase())
+                        return  item.user.fullname.toLowerCase().includes(search.toLowerCase())
                     case 2:
-                        return item.fullname.toLowerCase().includes(search.toLowerCase())
-
+                        return item.subject.subjectName.toLowerCase().includes(search.toLowerCase())
                     case 3:
-                        return item.email.toLowerCase().includes(search.toLowerCase())
-
+                        return item.room.roomName.toLowerCase().includes(search.toLowerCase())
+                    case 4:
+                        return item.reason.toLowerCase().includes(search.toLowerCase())
                     default:
-                        return item.username.toLowerCase().includes(search.toLowerCase())
+                        return item.user.fullname.toLowerCase().includes(search.toLowerCase())
 
                 }
 
@@ -111,14 +136,13 @@ export default function DanhSachTaiKhoan(props){
         {
             sortToggleType: SortToggleType.AlternateWithReset,
             sortFns: {
-                id: (array) => array.sort((a, b) => a.userId - b.userId),
-                tendangnhap: (array) => array.sort((a, b) => a.username.localeCompare(b.username)),
-                ten: (array) => array.sort((a, b) => a.fullname.localeCompare(b.fullname)),
-                password: (array) => array.sort((a, b) => a.password.localeCompare(b.password)),
-                email: (array) => array.sort((a, b) => a.email.localeCompare(b.email)),
-                quyen: (array) => array.sort((a, b) => a.role.localeCompare(b.role)),
-                ngaytao: (array) => array.sort((a, b) => a.createdAt - b.createdAt),
-                ngaysua: (array) => array.sort((a, b) => a.updatedAt - b.updatedAt),
+                id: (array) => array.sort((a, b) => a.requestId - b.requestId),
+                tengv: (array) => array.sort((a, b) => a.user.fullname.localeCompare(b.user.fullname)),
+                tenp: (array) => array.sort((a, b) => a.room.roomName.localeCompare(b.room.roomName)),
+                tenmonhoc: (array) => array.sort((a, b) => a.subject.subjectName.localeCompare(b.subject.subjectName)),
+                lydo: (array) => array.sort((a, b) => a.reason.localeCompare(b.reason)),
+                status: (array) => array.sort((a, b) => a.status.localeCompare(b.status)),
+                ngayyeucau: (array) => array.sort((a, b) => a.requestTime - b.requestTime),
             },
         }
     );
@@ -136,39 +160,32 @@ export default function DanhSachTaiKhoan(props){
         pagination.fns.onSetPage(0)
     };
     const COLUMNS = [
-        { label: 'ID', renderCell: (item) => item.userId,sort: { sortKey: "id" } },
-        { label: 'Tên đăng nhập', renderCell: (item) => item.username,sort: { sortKey: "tendangnhap" } },
-        { label: 'Tên người dùng ', renderCell: (item) => item.fullname,sort: { sortKey: "ten" } },
-        { label: 'Mật khẩu', renderCell: (item) => item.password,sort: { sortKey: "password" } },
-        { label: 'Email', renderCell: (item) => item.email,sort: { sortKey: "email" } },
-        { label: 'Quyền', renderCell: (item) => item.role,sort: { sortKey: "quyen" } },
+        { label: 'ID', renderCell: (item) => item.requestId,sort: { sortKey: "id" } },
+        { label: 'Tên giảng viên', renderCell: (item) => item.user.fullname,sort: { sortKey: "tengv" } },
+        { label: 'Tên phòng', renderCell: (item) => item.room.roomName,sort: { sortKey: "tenp" } },
+        { label: 'Tên môn học', renderCell: (item) => item.subject.subjectName,sort: { sortKey: "tenmonhoc" } },
+        { label: 'Lý do', renderCell: (item) => <>{item.reason===""? "Không có lý do": item.reason}</>,sort: { sortKey: "lydo" } },
+        { label: 'Trạng thái', renderCell: (item) => item.status,sort: { sortKey: "status" } },
         {
-            label: 'Ngày tạo',
+            label: 'Ngày yêu cầu',
             renderCell: (item) =>
-                new Date(item.createdAt).toLocaleDateString('en-GB', {
+                new Date(item.requestTime).toLocaleDateString('en-GB', {
                     year: 'numeric',
                     month: '2-digit',
                     day: '2-digit',
                 },),
-            sort: { sortKey: "ngaytao" }
+            sort: { sortKey: "ngayyeucau" }
         },
-        {
-            label: 'Ngày sửa',
-            renderCell: (item) =>
-                new Date(item.updatedAt).toLocaleDateString('en-GB', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                }),
-            sort: { sortKey: "ngaysua" }
-        },
+
         {label: '',renderCell: (item) => <div className="gap-2 d-flex justify-content-center align-items-center">
-                {item.role!=="ADMIN" &&
+                {item.status==="PENDING" &&
                 <>
-                    <Button variant="danger" style={{width:"70px"}} className="rounded-pill" onClick={()=>handleShow(item.userId,item.username)}>Xóa</Button>
-                    <Button variant="secondary" style={{width:"70px"}} className="rounded-pill" onClick={()=>{
-                        navigate(`../sua/${item.userId}`)
-                    }} >Sửa</Button>
+                    <Button variant="success" disabled={declineLoading} style={{width:"100px"}} className="rounded-pill" onClick={()=>{
+                        navigate(`../ChapNhan/${item.requestId}`)
+                    }} >Chấp nhận </Button>
+                    <Button variant="secondary" disabled={declineLoading} style={{width:"100px"}} className="rounded-pill" onClick={()=>{
+                        declineRequest(item.requestId)
+                    }} >Từ chối</Button>
                 </>
                 }
             </div>},
@@ -206,7 +223,7 @@ export default function DanhSachTaiKhoan(props){
         }
       `,
         Table: `
-                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
       `,
     });
     if(props.user.role==="GIANGVIEN"){
@@ -222,7 +239,7 @@ export default function DanhSachTaiKhoan(props){
             <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3 pb-3">
                 <h1 className="page-header">
-                    Danh sách người dùng
+                    Danh sách yêu cầu học bù
                 </h1>
                 <Container>
                     <Container className="d-flex p-0 justify-content-end" fluid>
@@ -232,9 +249,10 @@ export default function DanhSachTaiKhoan(props){
                                 title={searchLabel}
 
                             >
-                                <Dropdown.Item onClick={()=>setMode(1)}>Username</Dropdown.Item>
-                                <Dropdown.Item onClick={()=>setMode(2)}>FullName</Dropdown.Item>
-                                <Dropdown.Item onClick={()=>setMode(3)}>Email</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(1)}>Tên giảng viên</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(2)}>Tên môn học</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(3)}>Tên phòng</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(4)}>Lý do</Dropdown.Item>
                             </DropdownButton>
                             <Form.Control value={search} placeholder="Search" onChange={handleSearch}  />
                         </InputGroup>
@@ -281,14 +299,14 @@ export default function DanhSachTaiKhoan(props){
                     <Button className="w-25" variant="outline-secondary" disabled={deleteLoading} onClick={handleClose}>
                         Hủy
                     </Button>
-                    <Button className='w-25' style={{fontSize:"1em"}} onClick={()=>deleteData()} disabled={deleteLoading} variant="danger">
-                        {deleteLoading ?
-                            <>
-                                <Spinner size="sm" animation="border" variant="light" />
-                                Loading
-                            </>
-                            :"Xóa"}
-                    </Button>
+                        <Button className='w-25' style={{fontSize:"1em"}} onClick={()=>deleteData()} disabled={deleteLoading} variant="danger">
+                            {deleteLoading ?
+                                <>
+                                    <Spinner size="sm" animation="border" variant="light" />
+                                    Loading
+                                </>
+                                :"Xóa"}
+                        </Button>
                 </Modal.Footer>
             </Modal>
         </>

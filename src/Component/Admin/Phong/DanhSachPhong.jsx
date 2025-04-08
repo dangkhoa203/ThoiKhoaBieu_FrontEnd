@@ -1,17 +1,37 @@
 import {useNavigate} from "react-router";
 import {useEffect, useState} from "react";
-import {Button, Container, Modal, Spinner} from "react-bootstrap";
+import {Button, Container, Dropdown, DropdownButton, Form, InputGroup, Modal, Spinner} from "react-bootstrap";
 import {useTheme} from "@table-library/react-table-library/theme";
 import {CompactTable} from "@table-library/react-table-library/compact";
 import {SortToggleType, useSort} from "@table-library/react-table-library/sort";
 import {usePagination} from "@table-library/react-table-library/pagination";
 
-export default function DanhSachPhong(){
+export default function DanhSachPhong(props){
     const navigate = useNavigate();
     const [deleteModal, setDeleteModal] = useState({id:"",name:""});
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState("");
     const [show, setShow] = useState(false);
+    const [mode, setMode] = useState(1)
+    const [search, setSearch] = useState("");
+    const [searchLabel, setSearchLabel] = useState("Tên");
+
+    useEffect(() => {
+        console.log(searchLabel)
+        switch (mode){
+            case 1:
+                setSearchLabel("Tên");
+                break;
+            case 2:
+                setSearchLabel("Vị trí");
+                break;
+
+            default:
+                setSearchLabel("Username");
+                break;
+
+        }
+    },[mode])
     const handleClose = () => {
         setShow(false);
     };
@@ -24,7 +44,7 @@ export default function DanhSachPhong(){
                 setDeleteLoading(true);
                 setDeleteError("");
                 const response = await fetch(`http://localhost:8080/rooms/delete/${deleteModal.id}`, {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                     method: "DELETE",
                 });
                 const content = await response.json();
@@ -47,7 +67,7 @@ export default function DanhSachPhong(){
     ]);
     const getData=async ()=>{
         const response = await fetch('http://localhost:8080/rooms', {
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
             method:"GET",
             credentials:'include'
         });
@@ -62,6 +82,20 @@ export default function DanhSachPhong(){
         getData();
     },[])
     let data={nodes}
+    data={ nodes: data.nodes.filter((item) =>{
+                switch (mode){
+                    case 1:
+                        return  item.roomName.toLowerCase().includes(search.toLowerCase())
+                    case 2:
+                        return item.location.toLowerCase().includes(search.toLowerCase())
+                    default:
+                        return item.roomName.toLowerCase().includes(search.toLowerCase())
+
+                }
+
+            }
+        ),
+    }
     const sort = useSort(
         data,
         {
@@ -88,6 +122,10 @@ export default function DanhSachPhong(){
         onChange: onPaginationChange,
     });
     function onPaginationChange(action, state) {}
+    const handleSearch = (event) => {
+        setSearch(event.target.value);
+        pagination.fns.onSetPage(0)
+    };
     const COLUMNS = [
         { label: 'ID', renderCell: (item) => item.roomId,sort: { sortKey: "id" } },
         { label: 'Tên phòng', renderCell: (item) => item.roomName,sort: { sortKey: "ten" } },
@@ -156,14 +194,35 @@ export default function DanhSachPhong(){
                 --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr ;
       `,
     });
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return (
         <>
             <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3">
-                <h3>
+                <h1 className="page-header">
                     Danh sách phòng
-                </h3>
+                </h1>
                 <Container>
+                    <Container className="d-flex p-0 justify-content-end" fluid>
+                        <InputGroup style={{width:"400px"}} className="mb-3 rounded-0">
+                            <DropdownButton
+                                variant="dark"
+                                title={searchLabel}
+
+                            >
+                                <Dropdown.Item onClick={()=>setMode(1)}>Tên</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(2)}>Vị trí</Dropdown.Item>
+                            </DropdownButton>
+                            <Form.Control value={search} placeholder="Search" onChange={handleSearch}  />
+                        </InputGroup>
+                    </Container>
                     <CompactTable layout={{custom: true, horizontalScroll: true}}
                                   pagination={pagination} sort={sort} columns={COLUMNS}
                                   theme={theme} data={data}/>

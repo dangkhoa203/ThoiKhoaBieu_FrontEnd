@@ -1,8 +1,8 @@
 import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner} from "react-bootstrap";
-import {useState} from "react";
-import {useNavigate} from "react-router";
+import {useEffect, useState} from "react";
+import {useNavigate, useOutletContext} from "react-router";
 
-export default function TaoCaHoc(){
+export default function TaoCaHoc(props){
     const [data, setData] = useState({shiftName:"",startTime:"",endTime:""});
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -29,9 +29,10 @@ export default function TaoCaHoc(){
         setLoading(true);
         if(checkData()) {
             const response = await fetch('http://localhost:8080/shifts/create', {
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                 method: "POST",
                 credentials: 'include',
+
                 body: JSON.stringify(data),
             });
             const content = await response.json();
@@ -43,10 +44,18 @@ export default function TaoCaHoc(){
         }
         setLoading(false);
     }
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Tạo ca học </h1>
+            <h1 className="page-header">Tạo ca học </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6} md={4} xs={12}>
                     <FloatingLabel label="Tên ca" className="mb-3"

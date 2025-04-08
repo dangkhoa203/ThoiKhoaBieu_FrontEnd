@@ -1,8 +1,8 @@
 import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner} from "react-bootstrap";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 
-export default function TaoTaiKhoan(){
+export default function TaoTaiKhoan(props){
     const [data, setData] = useState({username:"",fullname:"",password:"",email:""});
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -40,8 +40,7 @@ export default function TaoTaiKhoan(){
         console.log(formData);
         if(checkData()) {
             const response = await fetch('http://localhost:8080/users/create', {
-                headers: {
-                },
+                headers: {'Authorization': 'Bearer ' + props.user.token},
                 method: "POST",
                 credentials: 'include',
                 body: formData,
@@ -56,10 +55,18 @@ export default function TaoTaiKhoan(){
         console.log(data)
         setLoading(false);
     }
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Tạo ca học </h1>
+            <h1 className="page-header">Tạo người dùng </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6} lg={3} xs={12}>
                     <FloatingLabel label="Tên đăng nhập" className="mb-3"
@@ -89,8 +96,9 @@ export default function TaoTaiKhoan(){
                                       onChange={handleEmailChange} placeholder="phong"/>
                     </FloatingLabel>
                 </Col>
-                <Col sm={6} lg={3} xs={12}>
-                    <Form.Group controlId="formFile" className="mb-3">
+                <Col sm={6}  xs={12}>
+                    <Form.Group  className="mb-3">
+                        <Form.Label>Hình ảnh</Form.Label>
                         <Form.Control size="lg" onChange={changeHandler} className="h-100" type="file" />
                     </Form.Group>
                 </Col>

@@ -1,8 +1,8 @@
 import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner} from "react-bootstrap";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 
-export default function TaoMonHoc(){
+export default function TaoMonHoc(props){
     const [data, setData] = useState({subjectName:"",description:""});
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function TaoMonHoc(){
         setLoading(true);
         if(checkData()) {
             const response = await fetch('http://localhost:8080/subjects/create', {
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                 method: "POST",
                 credentials: 'include',
                 body: JSON.stringify(data),
@@ -40,10 +40,18 @@ export default function TaoMonHoc(){
         }
         setLoading(false);
     }
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Tạo môn học </h1>
+            <h1 className="page-header">Tạo môn học </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6}  xs={12}>
                     <FloatingLabel label="Tên môn học" className="mb-3"

@@ -3,7 +3,10 @@ import {useEffect, useState} from "react";
 import ErrorPage from "../../ErrorPage.jsx";
 import {Button, Col, Container, FloatingLabel, Form, Row, Spinner} from "react-bootstrap";
 
-export default function SuaLopHoc(props){
+export default function AdminHocBuChapNhan(props){
+    let curr = new Date();
+    curr.setDate(curr.getDate()+1);
+    const date = curr.toISOString().substring(0,10);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const {id}=useParams()
@@ -13,9 +16,10 @@ export default function SuaLopHoc(props){
     const [roomData, setRoomData] = useState([]);
     const [userData, setUserData] = useState([]);
     const [shiftData, setShiftData] = useState([]);
-    const [data,setData]=useState({subject_id:0,room_id:0,user_id:0,shift_id:0})
+    const [data,setData]=useState({makeupDate:date,shift_id:0})
+    const [showData, setShowData]=useState({uName:"",sName:"",rName:""});
     const getData=async ()=>{
-        const response=await fetch(`http://localhost:8080/classess/${id}`,{
+        const response=await fetch(`http://localhost:8080/makeups/${id}`,{
             method:"GET",
             headers:{"Content-Type":"application/json"},
             credentials:'include'
@@ -27,25 +31,18 @@ export default function SuaLopHoc(props){
         }
         else {
             console.log(content)
-            setData({
-                subject_id:content.result.subject.subjectId,
-                room_id:content.result.room.roomId,
-                user_id:content.result.user.userId,
-                shift_id:content.result.shift.shiftId,
+            setShowData({
+                sName:content.result.subject.subjectName,
+                rName:content.result.room.roomName,
+                uName:content.result.user.fullname,
             })
         }
     }
-    const handleSubject=(e)=>{
-        setData({...data, subject_id: e.target.value});
-    }
-    const handleRoom=(e)=>{
-        setData({...data, room_id: e.target.value});
-    }
-    const handleUser=(e)=>{
-        setData({...data, user_id:e.target.value});
+    const handleDate=(e)=>{
+        setData({...data,makeupDate:e.target.value})
     }
     const handleShift=(e)=>{
-        setData({...data, shift_id: e.target.value});
+        setData({...data,shift_id:e.target.value})
     }
     const getSubjectData=async()=>{
         const response = await fetch('http://localhost:8080/subjects', {
@@ -60,32 +57,7 @@ export default function SuaLopHoc(props){
             setSubjectData(content.result);
         }
     }
-    const getRoomData=async()=>{
-        const response = await fetch('http://localhost:8080/rooms', {
-            headers: {'Content-Type': 'application/json'},
-            method:"GET",
-            credentials:'include'
-        });
-        const content = await response.json();
-        if (!response.ok) {
-            console.log(content.message);
-        }else {
-            setRoomData(content.result);
-        }
-    }
-    const getUserData=async()=>{
-        const response = await fetch('http://localhost:8080/users', {
-            headers: {'Content-Type': 'application/json'},
-            method:"GET",
-            credentials:'include'
-        });
-        const content = await response.json();
-        if (!response.ok) {
-            console.log(content.message);
-        }else {
-            setUserData(content.result);
-        }
-    }
+
     const getShiftData=async()=>{
         const response = await fetch('http://localhost:8080/shifts', {
             headers: {'Content-Type': 'application/json'},
@@ -110,11 +82,12 @@ export default function SuaLopHoc(props){
     const submit=async ()=>{
         setLoading(true);
         if(checkData()) {
-            const response = await fetch(`http://localhost:8080/classess/update/${id}`, {
+            const request={...data,makeupDate:new Date(data.makeupDate).toISOString()}
+            const response = await fetch(`http://localhost:8080/makeups/update/approve/${id}`, {
                 headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                 method: "PUT",
                 credentials: 'include',
-                body: JSON.stringify(data),
+                body: JSON.stringify(request),
             });
             const content = await response.json();
             if (!response.ok) {
@@ -128,8 +101,6 @@ export default function SuaLopHoc(props){
     useEffect(()=>{
         getData();
         getSubjectData();
-        getRoomData();
-        getUserData();
         getShiftData();
     },[])
     if(props.user.role==="GIANGVIEN"){
@@ -143,45 +114,44 @@ export default function SuaLopHoc(props){
     if(notFound){
         return <ErrorPage message={errorMessage.message}/>
     }
+
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
             <h1 className="page-header">Sửa môn học </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6}  xs={12}>
-                    <FloatingLabel className="mb-3" label="Môn học">
-                        <Form.Select value={data.subject_id} onClick={handleSubject} className="rounded-0" >
-                            <option  disabled value="">Open this select menu</option>
-                            {subjectData.map((item, index) => (
-                                <option  key={index} value={item.subjectId}>{item.subjectName}</option>
-                            ))}
-                        </Form.Select>
+                    <FloatingLabel label="Tên giảng viên" className="mb-3"
+                    >
+                        <Form.Control  value={showData.uName} disabled className="rounded-0"
+                                       placeholder="phong"/>
                     </FloatingLabel>
                 </Col>
                 <Col sm={6}  xs={12}>
-                    <FloatingLabel className="mb-3" label="Phòng">
-                        <Form.Select  value={data.room_id} onChange={handleRoom} className="rounded-0" >
-                            <option  disabled value="">Open this select menu</option>
-                            {roomData.map((item, index) => (
-                                <option  key={index} value={item.roomId}>{item.roomName}</option>
-                            ))}
-                        </Form.Select>
+                    <FloatingLabel label="Tên môn" className="mb-3"
+                    >
+                        <Form.Control  value={showData.sName} disabled className="rounded-0"
+                                       placeholder="phong"/>
                     </FloatingLabel>
                 </Col>
                 <Col sm={6}  xs={12}>
-                    <FloatingLabel className="mb-3" label="Giảng viên">
-                        <Form.Select value={data.user_id} onChange={handleUser} className="rounded-0" >
-                            <option disabled value="">Open this select menu</option>
-                            {userData.map((item, index) => (
-                                <option  key={index} value={item.userId}>{item.fullname}</option>
-                            ))}
-                        </Form.Select>
+                    <FloatingLabel label="Tên phòng" className="mb-3"
+                    >
+                        <Form.Control  value={showData.rName} disabled className="rounded-0"
+                                       placeholder="phong"/>
+                    </FloatingLabel>
+                </Col>
+                <Col sm={6}  xs={12}>
+                    <FloatingLabel label="Ca" className="mb-3"
+                    >
+                        <Form.Control  value={data.makeupDate} onChange={handleDate} className="rounded-0"  type="date"
+                                       placeholder="phong"/>
                     </FloatingLabel>
                 </Col>
                 <Col sm={6}  xs={12}>
                     <FloatingLabel className="mb-3" label="Ca">
                         <Form.Select value={data.shift_id} onChange={handleShift} className="rounded-0" >
-                            <option disabled value="">Open this select menu</option>
+                            <option selected disabled value={0}>Chọn thông tin</option>
                             {shiftData.map((item, index) => (
                                 <option key={index} value={item.shiftId}>{item.shiftName} ({`${item.startTime} -> ${item.endTime}`})</option>
                             ))}
@@ -191,8 +161,8 @@ export default function SuaLopHoc(props){
             </Row>
             <h4 className="text-danger">{errorMessage}</h4>
             <Button className=" fw-bolder rounded-0 " onClick={()=>submit()}
-                    style={{width:"300px"}} variant="dark" disabled={loading}>
-                {loading? <Spinner animation="border" variant="light" />:"Sửa"}
+                    style={{width:"300px"}} variant="success" disabled={loading}>
+                {loading? <Spinner animation="border" variant="light" />:"Chấp nhận"}
             </Button>
         </Container>
     )

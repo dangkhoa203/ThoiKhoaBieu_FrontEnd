@@ -6,7 +6,7 @@ import {CompactTable} from "@table-library/react-table-library/compact";
 import {SortToggleType, useSort} from "@table-library/react-table-library/sort";
 import {usePagination} from "@table-library/react-table-library/pagination";
 
-export default function DanhSachCaHoc(){
+export default function DanhSachCaHoc(props){
     const navigate = useNavigate();
     const [deleteModal, setDeleteModal] = useState({id:"",name:""});
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function DanhSachCaHoc(){
                 setDeleteLoading(true);
                 setDeleteError("");
                 const response = await fetch(`http://localhost:8080/shifts/delete/${deleteModal.id}`, {
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                     method: "DELETE",
                 });
                 const content = await response.json();
@@ -47,7 +47,7 @@ export default function DanhSachCaHoc(){
     ]);
     const getData=async ()=>{
         const response = await fetch('http://localhost:8080/shifts', {
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
             method:"GET",
             credentials:'include'
         });
@@ -134,13 +134,21 @@ export default function DanhSachCaHoc(){
                 --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr;
       `,
     });
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return (
         <>
             <hr className="my-3"/>
             <div className="container-fluid d-flex flex-column gap-3">
-                <h3>
+                <h1 className="page-header">
                     Danh sách ca học
-                </h3>
+                </h1>
                 <Container>
                     <CompactTable layout={{custom: true, horizontalScroll: true}}
                                   pagination={pagination} sort={sort} columns={COLUMNS}

@@ -1,7 +1,17 @@
 import {Col, Container, Row} from "react-bootstrap";
-import {Link, Outlet} from "react-router";
+import {Link, Outlet, useNavigate} from "react-router";
+import {useEffect} from "react";
 
-export default function MonHocMenu(){
+export default function MonHocMenu(props){
+    const navigate = useNavigate();
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <>
             <Container fluid className="text-center">

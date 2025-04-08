@@ -22,11 +22,14 @@ export default function SuaTaiKhoan(){
             setErrorMessage(content.message)
         }
         else {
-            setData({
-                username:content.result.username,
-                fullname:content.result.fullname,
-                password: content.result.password,
-            })
+            if(content.result.role==="ADMIN"){
+                setNotFound(true)
+            }else
+                setData({
+                    username:content.result.username,
+                    fullname:content.result.fullname,
+                    password: content.result.password,
+                })
         }
     }
     const handleUsernameChange = (e) => {
@@ -67,13 +70,21 @@ export default function SuaTaiKhoan(){
     useEffect(()=>{
         getData();
     },[])
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     if(notFound){
         return <ErrorPage message={errorMessage.message}/>
     }
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Tạo ca học </h1>
+            <h1 className="page-header">Sửa thông tin người dùng </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6} lg={4} xs={12}>
                     <FloatingLabel label="Tên đăng nhập" className="mb-3"

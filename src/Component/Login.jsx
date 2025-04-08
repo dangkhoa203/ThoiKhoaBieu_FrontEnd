@@ -1,49 +1,56 @@
-import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row} from "react-bootstrap";
+import {useNavigate} from "react-router";
 import {useEffect, useState} from "react";
-import {useNavigate, useOutletContext} from "react-router";
+import {Button, Col, Container, FloatingLabel, Form, Row} from "react-bootstrap";
 
-export default function AdminLogin(){
-    const {admin}=useOutletContext()
+export default function Login(props){
     const navigate = useNavigate();
     const [loginInfo,setLoginInfo] = useState({
-        UserName:"",
-        Password:"",
-        Remember:false,
+        email:"",
+        password:"",
     })
+    const [errorMessage,setErrorMessage] = useState("")
 
     const [showPassword,setShowPassword] = useState(false);
     const handleUsernameChange = (e) => {
-        setLoginInfo({...loginInfo, UserName: e.target.value});
+        setLoginInfo({...loginInfo, email: e.target.value});
     }
     const handlePasswordChange = (e) => {
-        setLoginInfo({...loginInfo, Password: e.target.value});
+        setLoginInfo({...loginInfo, password: e.target.value});
     }
-    const handleRemember = (e) => {
-        setLoginInfo({...loginInfo, Remember: e.target.checked});
-    }
+
     const handleShowPassword = (e) => {
         setShowPassword(e.target.checked);
     }
-    const adminLogin = () => {
-        if(loginInfo.UserName === "admin"){
-            if(loginInfo.Password === "admin"){
-                console.log("OK")
-            }
+    const adminLogin =async () => {
+        const response = await fetch('http://localhost:5125/api/Auth/login', {
+            headers: {'Content-Type': 'application/json'},
+            method: "POST",
+            credentials: 'include',
+            body: JSON.stringify(loginInfo),
+        });
+
+        if (!response.ok) {
+            const message = await response.text();
+            setErrorMessage(message);
+        } else {
+            const content = await response.json();
+            sessionStorage.setItem('account', content.jwt);
+            props.getInfo()
+            navigate("..")
         }
     }
+
     useEffect(() => {
-        console.log(admin);
-        if(admin.islog){
-            navigate("/admin");
-        }
-    },[])
+        if(props.user.islog)
+            navigate('..')
+    },[props.user])
 
     return(
-        <Container style={{height:"100%"}} fluid className="d-flex p-0 flex-column  justify-content-center align-items-center">
+        <Container style={{height:"100%"}} fluid className="d-flex p-0 mt-3 flex-column  justify-content-center align-items-center">
             <Container className='Login-Panel pb-5  '>
                 <Row className="LoginHero">
                     <Col>
-                        <h3 className='text-center'>Đăng nhập Admin</h3>
+                        <h3 className='text-center'>Đăng nhập</h3>
                     </Col>
                 </Row>
                 <Container className='Login-Form'>
@@ -51,12 +58,12 @@ export default function AdminLogin(){
                         <Col className="align-content-center">
                             <FloatingLabel
                                 controlId="floatingInput"
-                                label="UserName"
+                                label="Email"
                                 className="mb-3"
                             >
                                 <Form.Control
                                     onChange={(e)=>handleUsernameChange(e)}
-                                    value={loginInfo.UserName}
+                                    value={loginInfo.email}
                                     type="text" placeholder="username" className="rounded-pill " />
                             </FloatingLabel>
                         </Col>
@@ -71,18 +78,19 @@ export default function AdminLogin(){
                         </Col>
                     </Row>
                     <Row className="pt-3 pb-3 ps-3 text-center">
-                        <Col xs={12} md={6} className="d-flex mb-2 gap-2">
-                            <Form.Check value={loginInfo.Remember} onChange={(e)=>handleRemember(e)} type="checkbox"/>
-                            <h6>Nhớ lượt đăng nhập </h6>
-                        </Col>
-                        <Col xs={12} md={6} className="d-flex mb-2 gap-2 justify-content-md-end">
+                        <Col xs={12} className="d-flex mb-2 gap-2 ">
                             <Form.Check value={showPassword} onChange={(e)=>handleShowPassword(e)} type="checkbox"/>
                             <h6>Hiện mật khẩu </h6>
                         </Col>
                     </Row>
-                    <Row className='mt-2 '>
+                    <Row >
                         <Col className="d-flex justify-content-center align-items-center">
                             <Button onClick={()=> adminLogin()} style={{minWidth:"50%",maxWidth:"60%"}} className="rounded-pill" variant="success">Đăng nhập</Button>
+                        </Col>
+                    </Row>
+                    <Row className='mt-2 '>
+                        <Col>
+                            <h4 className="text-danger text-center">{errorMessage}</h4>
                         </Col>
                     </Row>
                 </Container>

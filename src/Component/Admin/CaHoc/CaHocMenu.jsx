@@ -1,7 +1,17 @@
 import {Col, Container, Row} from "react-bootstrap";
-import {Link, Outlet} from "react-router";
+import {Link, Outlet, useNavigate, useOutletContext} from "react-router";
+import {useEffect} from "react";
 
-export default function CaHocMenu(){
+export default function CaHocMenu(props){
+    const navigate = useNavigate();
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <>
             <Container fluid className="text-center">
@@ -15,8 +25,9 @@ export default function CaHocMenu(){
                         </Col>
                     </Row>
                 </Container>
-                <Outlet></Outlet>
+                <Outlet ></Outlet>
             </Container>
         </>
     )
+
 }

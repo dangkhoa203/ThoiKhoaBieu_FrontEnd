@@ -2,7 +2,7 @@ import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner} f
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 
-export default function AdminThemLichGiang(){
+export default function AdminThemLichGiang(props){
     let curr = new Date();
     curr.setDate(curr.getDate()+1);
     const date = curr.toISOString().substring(0,10);
@@ -77,7 +77,7 @@ export default function AdminThemLichGiang(){
         const request={...data,dayOfWeek:new Date(data.dayOfWeek).toISOString()};
         if(checkData()) {
             const response = await fetch('http://localhost:8080/classSchedules/create', {
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                 method: "POST",
                 credentials: 'include',
                 body: JSON.stringify(request),
@@ -96,16 +96,23 @@ export default function AdminThemLichGiang(){
         getClassData()
         getShiftData()
     },[])
-
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Tạo môn học </h1>
+            <h1 className="page-header">Tạo lịch học </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6}  xs={12}>
                     <FloatingLabel className="mb-3" label="Môn học">
                         <Form.Select onClick={handleClass} className="rounded-0" >
-                            <option selected disabled value="">Open this select menu</option>
+                            <option selected disabled value="">Chọn thông tin</option>
                             {classData.map((item, index) => (
                                 <option key={index} value={item.classId}>{`${item.user.username} - ${item.subject.subjectName}`}</option>
                             ))}
@@ -115,7 +122,7 @@ export default function AdminThemLichGiang(){
                 <Col sm={6}  xs={12}>
                     <FloatingLabel className="mb-3" label="Phòng">
                         <Form.Select onChange={handleRoom} className="rounded-0" >
-                            <option selected disabled value="">Open this select menu</option>
+                            <option selected disabled value="">Chọn thông tin</option>
                             {roomData.map((item, index) => (
                                 <option key={index} value={item.roomId}>{item.roomName}</option>
                             ))}
@@ -125,7 +132,7 @@ export default function AdminThemLichGiang(){
                 <Col sm={6}  xs={12}>
                     <FloatingLabel className="mb-3" label="Ca">
                         <Form.Select onChange={handleShift} className="rounded-0" >
-                            <option selected disabled value="">Open this select menu</option>
+                            <option selected disabled value="">Chọn thông tin</option>
                             {shiftData.map((item, index) => (
                                 <option key={index} value={item.shiftId}>{item.shiftName} ({`${item.startTime} -> ${item.endTime}`})</option>
                             ))}

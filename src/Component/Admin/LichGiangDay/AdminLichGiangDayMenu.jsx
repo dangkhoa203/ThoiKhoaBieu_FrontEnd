@@ -1,11 +1,20 @@
 import {Col, Container, Row} from "react-bootstrap";
-import {Link, Outlet} from "react-router";
+import {Link, Outlet, useNavigate} from "react-router";
+import {useEffect} from "react";
 
-export default function AdminLichGiangDayMenu(){
+export default function AdminLichGiangDayMenu(props){
+    const navigate = useNavigate();
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <>
             <Container fluid className="text-center">
-                <h1>Menu lịch giảng dạy</h1>
                 <Container className='justify-content-center d-flex' fluid>
                     <Row className="pt-3 w-75 justify-content-center">
                         <Col>

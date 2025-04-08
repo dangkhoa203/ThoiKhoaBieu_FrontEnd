@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import ErrorPage from "../../ErrorPage.jsx";
 import {Button, Col, Container, FloatingLabel, Form, Row, Spinner} from "react-bootstrap";
 
-export default function SuaCaHoc(){
+export default function SuaCaHoc(props){
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const {id}=useParams()
@@ -13,7 +13,7 @@ export default function SuaCaHoc(){
     const getData=async ()=>{
         const response=await fetch(`http://localhost:8080/shifts/${id}`,{
             method:"GET",
-            headers:{"Content-Type":"application/json"},
+            headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
             credentials:'include'
         });
         const content = await response.json();
@@ -51,7 +51,7 @@ export default function SuaCaHoc(){
         setLoading(true);
         if(checkData()) {
             const response = await fetch(`http://localhost:8080/shifts/update/${id}`, {
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                 method: "PUT",
                 credentials: 'include',
                 body: JSON.stringify(data),
@@ -68,13 +68,22 @@ export default function SuaCaHoc(){
     useEffect(()=>{
         getData();
     },[])
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     if(notFound){
         return <ErrorPage message={errorMessage.message}/>
     }
+
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Sửa thông tin ca học </h1>
+            <h1 className="page-header">Sửa thông tin ca học </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6} md={4} xs={12}>
                     <FloatingLabel label="Tên ca" className="mb-3"

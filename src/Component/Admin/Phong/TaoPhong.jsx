@@ -1,8 +1,8 @@
 import {Button, Col, Container, FloatingLabel, Form, InputGroup, Row, Spinner} from "react-bootstrap";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 
-export default function TaoPhong(){
+export default function TaoPhong(props){
     const [data, setData] = useState({roomName:"",capacity:0,location:""});
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -32,7 +32,7 @@ export default function TaoPhong(){
         setLoading(true);
         if(checkData()) {
             const response = await fetch('http://localhost:8080/rooms/create', {
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json','Authorization': 'Bearer ' + props.user.token},
                 method: "POST",
                 credentials: 'include',
                 body: JSON.stringify(data),
@@ -46,10 +46,18 @@ export default function TaoPhong(){
         }
         setLoading(false);
     }
+    if(props.user.role==="GIANGVIEN"){
+        navigate('/');
+    }
+    useEffect(() => {
+        if(props.user.role==="GIANGVIEN"){
+            navigate('/');
+        }
+    },[props.user]);
     return(
         <Container fluid className="px-lg-5">
             <hr className="my-3"/>
-            <h1>Tạo phòng học </h1>
+            <h1 className="page-header">Tạo phòng học </h1>
             <Row className="px-5 pt-2 justify-content-center">
                 <Col sm={6} md={4} xs={12}>
                     <FloatingLabel label="Tên phòng" className="mb-3"
