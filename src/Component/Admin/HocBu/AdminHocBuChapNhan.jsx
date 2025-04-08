@@ -73,7 +73,7 @@ export default function AdminHocBuChapNhan(props){
     }
     const checkData=()=>{
         setErrorMessage("")
-        if(data.room_id===""||data.user_id===""||data.subject_id===""||data.shift_id===""){
+        if(data.room_id===""||data.user_id===""||data.subject_id===""||data.shift_id===""||data.makeupDate===""){
             setErrorMessage("Chưa nhập thông tin đầy đủ");
             return false;
         }

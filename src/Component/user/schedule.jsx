@@ -27,6 +27,9 @@ function Schedule(props) {
       case 4:
         setSearchLabel("Thứ");
         break;
+      case 5:
+        setSearchLabel("Ngày");
+        break;
       default:
         setSearchLabel("Môn học");
         break;
@@ -63,10 +66,10 @@ function Schedule(props) {
               return item.roomName.toLowerCase().includes(search.toLowerCase())
             case 4:
               return item.dayOfWeek.toLowerCase().includes(search.toLowerCase())
-
+            case 5:
+              return item.dateStart.toLowerCase().includes(search.toLowerCase())
             default:
               return item.subjectName.toLowerCase().includes(search.toLowerCase())
-
           }
         }
     ),
@@ -79,11 +82,14 @@ function Schedule(props) {
       {
         sortToggleType: SortToggleType.AlternateWithReset,
         sortFns: {
-          id: (array) => array.sort((a, b) => a.subjectId - b.subjectId),
-          ten: (array) => array.sort((a, b) => a.subjectName.localeCompare(b.subjectName)),
-          mota: (array) => array.sort((a, b) => a.description.localeCompare(b.description)),
-          ngaytao: (array) => array.sort((a, b) => a.createdAt - b.createdAt),
-          ngaysua: (array) => array.sort((a, b) => a.updatedAt - b.updatedAt),
+          tenmh: (array) => array.sort((a, b) => a.subjectName.localeCompare(b.subjectName)),
+          gv: (array) => array.sort((a, b) => a.userName.localeCompare(b.userName)),
+          phong: (array) => array.sort((a, b) => a.roomName.localeCompare(b.roomName)),
+          diadiem: (array) => array.sort((a, b) => a.location.localeCompare(b.location)),
+          gbd: (array) => array.sort((a, b) => a.startTime.localeCompare(b.startTime)),
+          gkt: (array) => array.sort((a, b) => a.endTime.localeCompare(b.endTime)),
+          thu: (array) => array.sort((a, b) => a.dayOfWeek.localeCompare(b.dayOfWeek)),
+          ngay: (array) => array.sort((a, b) => a.dateStart.localeCompare(b.dateStart)),
         },
       }
   );
@@ -101,13 +107,14 @@ function Schedule(props) {
     pagination.fns.onSetPage(0)
   };
   const COLUMNS = [
-    { label: 'Tên môn học', renderCell: (item) => item.subjectName,sort: { sortKey: "ten" } },
-    { label: 'Giảng viên', renderCell: (item) => item.userName,sort: { sortKey: "soluong" } },
-    { label: 'Phòng', renderCell: (item) =>item.roomName},
-    { label: 'Địa điểm', renderCell: (item) =>item.location},
-    { label: 'Giờ bắt đầu', renderCell: (item) =>item.startTime},
-    { label: 'Giờ kết thúc', renderCell: (item) =>item.endTime},
-    { label: 'Thứ', renderCell: (item) =>item.dayOfWeek},
+    { label: 'Tên môn học', renderCell: (item) => item.subjectName,sort: { sortKey: "tenmh" } },
+    { label: 'Giảng viên', renderCell: (item) => item.userName,sort: { sortKey: "gv" } },
+    { label: 'Phòng', renderCell: (item) =>item.roomName,sort: { sortKey: "phong" }},
+    { label: 'Địa điểm', renderCell: (item) =>item.location,sort: { sortKey: "diadiem" }},
+    { label: 'Giờ bắt đầu', renderCell: (item) =>item.startTime,sort: { sortKey: "gbd" }},
+    { label: 'Giờ kết thúc', renderCell: (item) =>item.endTime,sort: { sortKey: "gkt" }},
+    { label: 'Thứ', renderCell: (item) =>item.dayOfWeek,sort: { sortKey: "thu" }},
+    { label: 'Ngày', renderCell: (item) =>item.dateStart,sort: { sortKey: "ngay" }},
   ];
   const theme = useTheme({
     HeaderRow: `
@@ -142,7 +149,7 @@ function Schedule(props) {
         }
       `,
     Table: `
-                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
       `,
   });
 
@@ -172,6 +179,7 @@ function Schedule(props) {
                   <Dropdown.Item onClick={()=>setMode(2)}>Giảng viên</Dropdown.Item>
                   <Dropdown.Item onClick={()=>setMode(3)}>Phòng</Dropdown.Item>
                   <Dropdown.Item onClick={()=>setMode(4)}>Thứ</Dropdown.Item>
+                  <Dropdown.Item onClick={()=>setMode(5)}>Ngày</Dropdown.Item>
                 </DropdownButton>
                 <Form.Control value={search} placeholder="Search" onChange={handleSearch}  />
               </InputGroup>

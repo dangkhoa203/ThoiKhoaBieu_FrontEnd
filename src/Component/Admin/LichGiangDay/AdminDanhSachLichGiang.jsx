@@ -31,6 +31,9 @@ export  default  function AdminDanhSachLichGiang(props){
             case 4:
                 setSearchLabel("Thứ");
                 break;
+            case 5:
+                setSearchLabel("Ngày");
+                break;
             default:
                 setSearchLabel("Môn học");
                 break;
@@ -98,7 +101,8 @@ export  default  function AdminDanhSachLichGiang(props){
                         return item.roomName.toLowerCase().includes(search.toLowerCase())
                     case 4:
                         return item.dayOfWeek.toLowerCase().includes(search.toLowerCase())
-
+                    case 5:
+                        return item.dateStart.toLowerCase().includes(search.toLowerCase())
                     default:
                         return item.subjectName.toLowerCase().includes(search.toLowerCase())
 
@@ -122,6 +126,7 @@ export  default  function AdminDanhSachLichGiang(props){
                 gbd: (array) => array.sort((a, b) => a.startTime.localeCompare(b.startTime)),
                 gkt: (array) => array.sort((a, b) => a.endTime.localeCompare(b.endTime)),
                 thu: (array) => array.sort((a, b) => a.dayOfWeek.localeCompare(b.dayOfWeek)),
+                ngay: (array) => array.sort((a, b) => a.dateStart.localeCompare(b.dateStart)),
             },
         }
     );
@@ -146,6 +151,7 @@ export  default  function AdminDanhSachLichGiang(props){
         { label: 'Giờ bắt đầu', renderCell: (item) =>item.startTime,sort: { sortKey: "gbd" }},
         { label: 'Giờ kết thúc', renderCell: (item) =>item.endTime,sort: { sortKey: "gkt" }},
         { label: 'Thứ', renderCell: (item) =>item.dayOfWeek,sort: { sortKey: "thu" }},
+        { label: 'Ngày', renderCell: (item) =>item.dateStart,sort: { sortKey: "ngay" }},
         {label: '',renderCell: (item) => <div className="gap-2 d-flex justify-content-center align-items-center">
                 <Button variant="danger" style={{width:"70px"}} className="rounded-pill" onClick={()=>handleShow(item.scheduleId)}>Xóa</Button>
             </div>},
@@ -183,7 +189,7 @@ export  default  function AdminDanhSachLichGiang(props){
         }
       `,
         Table: `
-                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+                --data-table-library_grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
       `,
     });
     if(props.user.role==="GIANGVIEN"){
@@ -213,6 +219,7 @@ export  default  function AdminDanhSachLichGiang(props){
                                 <Dropdown.Item onClick={()=>setMode(2)}>Giảng viên</Dropdown.Item>
                                 <Dropdown.Item onClick={()=>setMode(3)}>Phòng</Dropdown.Item>
                                 <Dropdown.Item onClick={()=>setMode(4)}>Thứ</Dropdown.Item>
+                                <Dropdown.Item onClick={()=>setMode(5)}>Ngày</Dropdown.Item>
                             </DropdownButton>
                             <Form.Control value={search} placeholder="Search" onChange={handleSearch}  />
                         </InputGroup>

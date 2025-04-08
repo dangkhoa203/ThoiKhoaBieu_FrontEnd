@@ -140,7 +140,7 @@ export default function AdminThemLichGiang(props){
                     </FloatingLabel>
                 </Col>
                 <Col sm={6}  xs={12}>
-                    <FloatingLabel label="Tên ca" className="mb-3"
+                    <FloatingLabel label="Ngày học" className="mb-3"
                     >
                         <Form.Control  value={data.dayOfWeek} onChange={handleDay} className="rounded-0"  type="date"
                                        placeholder="phong"/>

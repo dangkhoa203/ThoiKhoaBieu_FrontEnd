@@ -122,7 +122,7 @@ export default function TaoHocBu(props){
                     </FloatingLabel>
                 </Col>
                 <Col sm={6}  xs={12}>
-                    <FloatingLabel label="Ngày bù" className="mb-3"
+                    <FloatingLabel label="Ngày muốn bù" className="mb-3"
                     >
                         <Form.Control  value={data.requestTime} onChange={handleDateTime} className="rounded-0"  type="date"
                                        placeholder="phong"/>
